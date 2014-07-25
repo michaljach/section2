@@ -10,8 +10,11 @@ function get_posts($page = 1, $per_page = 10){
     $files_array = array_slice($files_array, $page*$per_page-$per_page, $per_page);
     if(!empty($files_array)){
         foreach ($files_array as $key => $value) {
-            if(pathinfo($value)['extension'] == 'md')
-                $posts[] = file_get_contents('posts/' . $value);
+            if(pathinfo($value)['extension'] == 'md'){
+                $posts[]['content'] = file_get_contents('posts/' . $value);
+                $posts[]['date'] = explode('+', $value)[0];
+                $posts[]['slug'] = explode('+', $value)[1];
+            }
         }
         return $posts;
     } else return array();
@@ -47,7 +50,7 @@ function render_markdown($text) {
     $text = preg_replace('/\[([^\]]+)]\(([a-z0-9._~:\/?#@!$&\'()*+,;=%]+)\)/i', '<a href="$2">$1</a>', $text);
     $text = str_replace('\r\n', '\n', $text);
     $text = str_replace('\r', '\n', $text);
-    $text = '<p>' . str_replace("\n\n", '</p><p>', $text) . '</p>';
+    $text = str_replace("\n\n", '<p>', $text) . '</p>';
     $text = str_replace("\n", '<br />', $text);
 
     return $text;
