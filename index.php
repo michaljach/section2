@@ -11,13 +11,37 @@ function get_posts($page = 1, $per_page = 10){
     if(!empty($files_array)){
         foreach ($files_array as $key => $value) {
             if(pathinfo($value)['extension'] == 'md'){
-                $posts[]['content'] = file_get_contents('posts/' . $value);
-                $posts[]['date'] = explode('+', $value)[0];
-                $posts[]['slug'] = explode('+', $value)[1];
+                $content = file_get_contents('posts/' . $value);
+                $date = filemtime('posts/' . $value);
+                $slug = str_replace('.md', '', $value);
+                $time = round(str_word_count($content)/60) > 0 ? round(str_word_count($content)/60) : 1;
+
+                echo '<article>';
+                echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
+                echo '<h1 class="title"><a href="?id=' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
+                $content = render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
+                if (strlen($content) > 700) {
+                    $stringCut = substr($content, 0, 700);
+                    echo substr($stringCut, 0, strrpos($stringCut, ' ')).'... <a href="?id=' . str_replace('.md', '', $value) . '">Continue reading</a>'; 
+                } else {
+                    echo $content;
+                }
+                echo '</article>';
             }
         }
-        return $posts;
-    } else return array();
+    } else echo 'No posts!';
+}
+function get_post($slug){
+    if(file_exists('posts/' . $slug . '.md')){
+        $content = file_get_contents('posts/' . $slug . '.md');
+        $date = filemtime('posts/' . $slug . '.md');
+        $time = round(str_word_count($content)/60) > 0 ? round(str_word_count($content)/60) : 1;
+        echo '<article>';
+        echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
+        echo '<h1 class="title">' . str_replace('#', '', strtok($content, "\n")) . '</h1>';        
+        echo render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
+        echo '</article>';
+    }
 }
 function get_settings(){
     if(!file_exists('config.php')){
@@ -31,28 +55,33 @@ function get_request($param){
         return $_GET[$param];
     } else return NULL;
 }
-function render_markdown($text) {
-    $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    $text = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $text);
-    $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
-    $text = preg_replace('/_([^_]+)_/', '<span style="text-decoration: underline;">$1</span>', $text);
-    $text = preg_replace('/\*([^\*]+)\*/', '<em>$1</em>', $text);
-    $text = preg_replace('/`(.*?)`/', '<code>$1</code>', $text);
-    $text = preg_replace('/\/t/', '    ', $text);
-    $text = preg_replace('/    (.*)/', '<code>$1</code>', $text);
-    $text = preg_replace('/\n(&gt;|\>) (.*)/', '<blockquote>$2</blockquote>', $text);
-    $text = preg_replace('/(######) (.*)/', '<h6>$2</h6>', $text);
-    $text = preg_replace('/(#####) (.*)/', '<h5>$2</h5>', $text);
-    $text = preg_replace('/(####) (.*)/', '<h4>$2</h4>', $text);
-    $text = preg_replace('/(###) (.*)/', '<h3>$2</h3>', $text);
-    $text = preg_replace('/(##) (.*)/', '<h2>$2</h2>', $text);
-    $text = preg_replace('/(#) (.*)/', '<h1>$2</h1>', $text);
-    $text = preg_replace('/\[([^\]]+)]\(([a-z0-9._~:\/?#@!$&\'()*+,;=%]+)\)/i', '<a href="$2">$1</a>', $text);
-    $text = str_replace('\r\n', '\n', $text);
-    $text = str_replace('\r', '\n', $text);
-    $text = str_replace("\n\n", '<p>', $text) . '</p>';
-    $text = str_replace("\n", '<br />', $text);
-
+function render_markdown($text){
+    $rules = array (
+        '/(#+) (.*)/' => sprintf ('<h%d>%s</h%d>', strlen('$1'), trim ('$2'), strlen('$1')),
+        '/\[([^\[]+)\]\(([^\)]+)\)/' => '<a href=\'\2\'>\1</a>',
+        '/(\*\*|__)(.*?)\1/' => '<strong>\2</strong>',
+        '/(\*|_)(.*?)\1/' => '<em>\2</em>',
+        '/\~\~ (.*?) \~\~/' => '<del>\1</del>',
+        '/\:\" (.*?) \"\:/' => '<q>\1</q>',
+        '/`(.*?)`/' => '<code>\1</code>',
+        '/\n    (.*)/' => sprintf ("<pre>%s</pre>", trim ('$1')),
+        '/\n\* (.*)/' => sprintf ("<ul><li>%s</li></ul>", trim('$1')),
+        '/\n[0-9]+\. (.*)/' => sprintf ("<ol><li>%s</li></ol>", trim ('$1')),
+        '/\n>|\n&gt; (.*)/' => sprintf ("<blockquote>%s</blockquote>", trim ('$1')),
+        '/\n-{5,}/' => "<hr />",
+        '/\n([^\n]+)\n/' => sprintf ("<p>%s</p>", trim('$1')),
+        '/<p><(ul|ol|li|h|p|bl)>/' => '<$1>',
+        '/<\/(ul|ol|li|h|p|bl)><\/p>/' => '</$1>',
+        '/<\/ul>\s?<ul>/' => '',
+        '/<\/ol>\s?<ol>/' => '',
+        '/<\/blockquote>\s?<blockquote>/' => "</br>",
+        '/<\/code>\s?<code>/' => "</br>",
+        '/<\/pre>\s?<pre>/' => "</br>"
+    );
+    $text = "\n" . $text . "\n";
+    foreach ($rules as $regex => $replacement){
+        $text = preg_replace ($regex, $replacement, $text);
+    }
     return $text;
 }
 function render_template($template){
@@ -66,7 +95,7 @@ if(get_request('id') == 'admin'){
     render_template('header');
     render_template('posts');
     render_template('footer');
-} else if(intval(get_request('id'))){
+} else {
     render_template('header');
     render_template('post');
     render_template('footer');

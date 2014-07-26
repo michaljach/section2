@@ -7,5 +7,7 @@
 </head>
 <body>
 <header>
-<h1><?=TITLE?></h1>
+<h1>
+    <a href="<?=URL?>"><?=HEADER?></a>
+</h1>
 </header>
