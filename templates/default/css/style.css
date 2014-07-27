@@ -28,15 +28,9 @@ header {
 }
 header h1 a {
     font-size: 38px;
-    height: 55px;
-    background: #000;
-    color: #fff;
     display: inline-block;
     text-align: center;
-    padding: 0 10px;
-}
-header h1 a:hover {
-    color: #fff;
+    color: #000;
 }
 section {
     width: 60%;
@@ -46,9 +40,12 @@ section {
 }
 article {
     border-bottom: 2px solid #f7f7f7;
-    margin-bottom: 40px;
-    padding-bottom: 40px;
-    line-height: 1.5em;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+}
+article > span {
+    color: #a4adb6;
+    font-size: 14px;
 }
 article:last-child {
     margin-bottom: 0;
@@ -56,14 +53,19 @@ article:last-child {
 footer {
     width: 60%;
     max-width: 720px;
-    margin: 0 auto;
-    text-align: right;
+    margin: 20px auto;
+    border-top: 2px solid #f7f7f7;
+    overflow: hidden;
 }
 footer span,
 footer span a {
     color: #e2e0e0;
     text-transform: uppercase;
     font-size: 12px;
+    margin: 10px 0;
+}
+footer span {
+    float: right;
 }
 p {
     overflow: hidden;
@@ -78,6 +80,9 @@ pre {
     display: block;
     padding: 10px;
     font-size: 16px;
+    white-space: -moz-pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
 }
 blockquote {
     font-family: 'Vesper Libre', serif;
@@ -88,6 +93,53 @@ blockquote {
     margin-left: 20px; 
 }
 .info {
-    color: #a4adb6;
+    margin-top: 20px;
+    overflow: hidden;
+}
+.user-info {
+    overflow: hidden;
+    width: 60%;
+    float: left;
+}
+.user-info img {
+    width: 80px;
+    float: left;
+    margin-right: 20px;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+}
+.user-info h4 {
+    margin: 0;
+}
+.user-bio {
+    padding-top: 5px;
+}
+.user-info span,
+.user-bio span {
     font-size: 14px;
+    color: #888;
+    display: block;
+}
+@media all and (max-width: 699px){
+    header {
+        margin-top: 0;
+    }
+    header h1 {
+        margin-bottom: 0;
+    }
+    header, section, footer {
+        width: 90%;
+    }
+    article h1 {
+        font-size: 24px;
+    }
+    .user-info {
+        float: none;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .user-bio {
+        margin-left: 100px;
+    }
 }

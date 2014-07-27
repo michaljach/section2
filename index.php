@@ -17,7 +17,7 @@ function get_posts($page = 1, $per_page = 10){
                 $time = round(str_word_count($content)/60) > 0 ? round(str_word_count($content)/60) : 1;
 
                 echo '<article>';
-                echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
+                echo '<span>' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
                 echo '<h1 class="title"><a href="?id=' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
                 $content = render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
                 if (strlen($content) > 700) {
@@ -58,6 +58,7 @@ function get_request($param){
 function render_markdown($text){
     $rules = array (
         '/(#+) (.*)/' => sprintf ('<h%d>%s</h%d>', strlen('$1'), trim ('$2'), strlen('$1')),
+        '/\!\[(.*)\]\((.*)\)/' => '<img src="$2" alt="$1">',
         '/\[([^\[]+)\]\(([^\)]+)\)/' => '<a href=\'\2\'>\1</a>',
         '/(\*\*|__)(.*?)\1/' => '<strong>\2</strong>',
         '/(\*|_)(.*?)\1/' => '<em>\2</em>',
