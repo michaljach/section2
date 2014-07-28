@@ -10,7 +10,8 @@ function get_posts($page = 1, $per_page = 10){
     $files_array = array_slice($files_array, $page*$per_page-$per_page, $per_page);
     if(!empty($files_array)){
         foreach ($files_array as $key => $value) {
-            if(pathinfo($value)['extension'] == 'md'){
+            $info = pathinfo($value);
+            if($info['extension'] == 'md'){
                 $content = file_get_contents('posts/' . $value);
                 $date = filemtime('posts/' . $value);
                 $slug = str_replace('.md', '', $value);
@@ -18,11 +19,11 @@ function get_posts($page = 1, $per_page = 10){
 
                 echo '<article>';
                 echo '<span>' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
-                echo '<h1 class="title"><a href="?id=' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
+                echo '<h1 class="title"><a href="' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
                 $content = render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
                 if (strlen($content) > 700) {
                     $stringCut = substr($content, 0, 700);
-                    echo substr($stringCut, 0, strrpos($stringCut, ' ')).'... <a href="?id=' . str_replace('.md', '', $value) . '">Continue reading</a>'; 
+                    echo substr($stringCut, 0, strrpos($stringCut, ' ')).'... <a href="' . str_replace('.md', '', $value) . '">Continue reading</a>'; 
                 } else {
                     echo $content;
                 }
