@@ -37,7 +37,13 @@ function get_post($slug){
         $content = file_get_contents('posts/' . $slug . '.md');
         $date = filemtime('posts/' . $slug . '.md');
         $time = round(str_word_count($content)/60) > 0 ? round(str_word_count($content)/60) : 1;
-        echo '<article>';
+        $class = '';
+        if(preg_match("/\!\[cover\]\((.*)\)/i", $content, $cover)){
+            echo '<div class="post-bg" style="background-image: url(' . $cover[1] . ');"></div>';
+            $class = ' class="cover"';
+            $content = str_replace($cover[0], '', $content);
+        }
+        echo '<article' . $class . '>';
         echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
         echo '<h1 class="title">' . str_replace('#', '', strtok($content, "\n")) . '</h1>';        
         echo render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
@@ -66,6 +72,7 @@ function render_markdown($text){
         '/\~\~ (.*?) \~\~/' => '<del>\1</del>',
         '/\:\" (.*?) \"\:/' => '<q>\1</q>',
         '/`(.*?)`/' => '<code>\1</code>',
+        '/---/' => '—',
         '/\n    (.*)/' => sprintf ("<pre>%s</pre>", trim ('$1')),
         '/\n\* (.*)/' => sprintf ("<ul><li>%s</li></ul>", trim('$1')),
         '/\n[0-9]+\. (.*)/' => sprintf ("<ol><li>%s</li></ol>", trim ('$1')),
