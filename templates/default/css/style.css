@@ -144,32 +144,40 @@ blockquote {
 }
 @media all and (max-width: 699px){
     header {
-        margin-top: 0;
+        margin: 0;
     }
     header h1 {
         margin-bottom: 0;
     }
     header h1 a {
-        margin-top: 20px;
     }
     header, article, footer {
-        width: 90%;
+        width: 95%;
+    }
+    article {
+        padding-top: 10px;
     }
     article h1 {
         font-size: 24px;
     }
+    pre, code {
+        font-size: 14px;
+    }
     .post-bg {
-        height: 140px;
+        height: 130px;
     }
     .cover {
         margin-top: 60px;
+    }
+    .info {
+        width: 100%;
+    }
+    .user-bio {
+        text-align: center;
     }
     .user-info {
         float: none;
         width: 100%;
         margin-bottom: 20px;
-    }
-    .user-bio {
-        margin-left: 100px;
     }
 }

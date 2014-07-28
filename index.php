@@ -20,6 +20,7 @@ function get_posts($page = 1, $per_page = 10){
                 echo '<article>';
                 echo '<span>' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
                 echo '<h1 class="title"><a href="' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
+                $content = preg_replace("/\!\[cover\]\((.*)\)/i", '', $content);
                 $content = render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
                 if (strlen($content) > 700) {
                     $stringCut = substr($content, 0, 700);
