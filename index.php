@@ -6,7 +6,7 @@
 */
 function get_posts($page = 1, $per_page = 10){
     $page = $page == 0 ? 1 : $page;
-    $files_array = array_diff(scandir('posts',1), array('..', '.'));
+    $files_array = array_diff(scandir('posts',0), array('..', '.'));
     $files_array = array_slice($files_array, $page*$per_page-$per_page, $per_page);
     if(!empty($files_array)){
         foreach ($files_array as $key => $value) {
