@@ -45,6 +45,9 @@ article {
     max-width: 720px;
     margin: 0 auto;
 }
+article img {
+    max-width: 100%;
+}
 article > span {
     color: #a4adb6;
     font-size: 14px;
