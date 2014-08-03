@@ -97,10 +97,26 @@ function render_markdown($text){
 function render_template($template){
     include('templates/' . TEMPLATE . '/' . $template . '.php');
 }
+function get_slug($str) {
+    $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+    $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+    $clean = strtolower(trim($clean, '-'));
+    $clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
+
+    return $clean;
+}
+function load_admin(){
+    if($_POST){
+        file_put_contents('posts/' . get_slug($_POST['title']) . '.md', '# ' . $_POST['title'] . "\r\n" . $_POST['text']);
+        return true;
+    } else {
+        render_template('admin_index');
+    }
+}
 // Main
 get_settings();
 if(get_request('id') == 'admin'){
-
+    load_admin();
 } else if(get_request('id') == NULL){
     render_template('header');
     render_template('posts');
