@@ -6,19 +6,20 @@
 */
 function get_posts($page = 1, $per_page = 10){
     $page = $page == 0 ? 1 : $page;
-    $files_array = array_diff(scandir('posts',0), array('..', '.'));
-    $files_array = array_slice($files_array, $page*$per_page-$per_page, $per_page);
+    foreach (array_diff(scandir('posts'), array('..', '.')) as $file) {
+        $files_array[filemtime('posts/' . $file)] = $file;
+    }
+    krsort($files_array);
+    $files_array = array_slice($files_array, $page*$per_page-$per_page, $per_page, true);
     if(!empty($files_array)){
         foreach ($files_array as $key => $value) {
             $info = pathinfo($value);
             if($info['extension'] == 'md'){
                 $content = file_get_contents('posts/' . $value);
-                $date = filemtime('posts/' . $value);
                 $slug = str_replace('.md', '', $value);
                 $time = round(str_word_count($content)/60) > 0 ? round(str_word_count($content)/60) : 1;
-
                 echo '<article>';
-                echo '<span>' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
+                echo '<span>' . $time . ' minute read — ' . date('F j, Y', $key) . '</span>';
                 echo '<h1 class="title"><a href="' . str_replace('.md', '', $value) . '">' . str_replace('#', '', strtok($content, "\n")) . '</a></h1>';
                 $content = preg_replace("/\!\[cover\]\((.*)\)/i", '', $content);
                 $content = render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
