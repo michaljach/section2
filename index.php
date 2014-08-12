@@ -68,12 +68,12 @@ function get_request($param){
     } else return NULL;
 }
 function get_slug($str) {
-    $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
-    $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
-    $clean = strtolower(trim($clean, '-'));
-    $clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
+    $slug = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+    $slug = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $slug);
+    $slug = strtolower(trim($slug, '-'));
+    $slug = preg_replace("/[\/_|+ -]+/", '-', $slug);
 
-    return $clean;
+    return $slug;
 }
 function user_login(){
     if($_POST['password'] == PASSWORD){
@@ -95,10 +95,10 @@ function render_markdown($text){
         '/\:\" (.*?) \"\:/' => '<q>\1</q>',
         '/`(.*?)`/' => '<code>\1</code>',
         '/---/' => '—',
-        '/\n    (.*)/' => sprintf ("<pre>%s</pre>", trim ('$1')),
+        '/\n    (.*)/' => sprintf ("<pre>%s</pre>", trim('$1')),
         '/\n\* (.*)/' => sprintf ("<ul><li>%s</li></ul>", trim('$1')),
-        '/\n[0-9]+\. (.*)/' => sprintf ("<ol><li>%s</li></ol>", trim ('$1')),
-        '/\n>|\n&gt; (.*)/' => sprintf ("<blockquote>%s</blockquote>", trim ('$1')),
+        '/\n[0-9]+\. (.*)/' => sprintf ("<ol><li>%s</li></ol>", trim('$1')),
+        '/\n>|\n&gt; (.*)/' => sprintf ("<blockquote>%s</blockquote>", trim('$1')),
         '/\n-{5,}/' => "<hr />",
         '/\n([^\n]+)\n/' => sprintf ("<p>%s</p>", trim('$1')),
         '/<p><(ul|ol|li|h|p|bl)>/' => '<$1>',

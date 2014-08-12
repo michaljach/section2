@@ -17,6 +17,10 @@
         </script>
     </head>
     <body>
+        <header>
+            <h1>§2</h1>
+            <span><a href="logout">Logout</a></span>
+        </header>
         <input id="input-title" type="text" value="Enter title...">
         <textarea id="input-text">Write something...</textarea>
         <button id="input-save">SAVE</button>
