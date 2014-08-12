@@ -48,9 +48,12 @@ function get_post($slug){
         echo '<article' . $class . '>';
         echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
         echo '<h1 class="title">' . str_replace('#', '', strtok($content, "\n")) . '</h1>';        
-        echo render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1 )));
+        echo render_markdown(stripslashes(htmlspecialchars(substr($content, strpos($content, "\n")+1))));
         echo '</article>';
     }
+}
+function add_post(){
+    file_put_contents('posts/' . get_slug($_POST['title']) . '.md', '# ' . $_POST['title'] . "\r\n" . $_POST['text']);
 }
 function get_settings(){
     if(!file_exists('config.php')){
@@ -64,13 +67,30 @@ function get_request($param){
         return $_GET[$param];
     } else return NULL;
 }
+function get_slug($str) {
+    $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+    $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+    $clean = strtolower(trim($clean, '-'));
+    $clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
+
+    return $clean;
+}
+function user_login(){
+    if($_POST['password'] == PASSWORD){
+        $_SESSION['user'] = $_SERVER['HTTP_USER_AGENT'];
+        $_SESSION['login_string'] = hash('sha512', PASSWORD . $_SERVER['HTTP_USER_AGENT']);
+        render_template('admin_index');
+    } else {
+        render_template('admin_login');
+    }
+}
 function render_markdown($text){
     $rules = array (
         '/(#+) (.*)/' => sprintf ('<h%d>%s</h%d>', strlen('$1'), trim ('$2'), strlen('$1')),
         '/\!\[(.*)\]\((.*)\)/' => '<img src="$2" alt="$1">',
         '/\[([^\[]+)\]\(([^\)]+)\)/' => '<a href=\'\2\'>\1</a>',
         '/(\*\*|__)(.*?)\1/' => '<strong>\2</strong>',
-        '/(\*|_)(.*?)\1/' => '<em>\2</em>',
+        '/[\s]+(\*|_)(.*?)\1/' => ' <em>\2</em>',
         '/\~\~ (.*?) \~\~/' => '<del>\1</del>',
         '/\:\" (.*?) \"\:/' => '<q>\1</q>',
         '/`(.*?)`/' => '<code>\1</code>',
@@ -91,33 +111,33 @@ function render_markdown($text){
     );
     $text = "\n" . $text . "\n";
     foreach ($rules as $regex => $replacement){
-        $text = preg_replace ($regex, $replacement, $text);
+        $text = preg_replace($regex, $replacement, $text);
     }
     return $text;
 }
 function render_template($template){
     include('templates/' . TEMPLATE . '/' . $template . '.php');
 }
-function get_slug($str) {
-    $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
-    $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
-    $clean = strtolower(trim($clean, '-'));
-    $clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
-
-    return $clean;
-}
 function load_admin(){
-    if($_POST){
-        file_put_contents('posts/' . get_slug($_POST['title']) . '.md', '# ' . $_POST['title'] . "\r\n" . $_POST['text']);
-        return true;
+    if(isset($_POST['title'])){
+        add_post();
+    } else if(isset($_POST['password'])){
+        user_login();
     } else {
-        render_template('admin_index');
+        if(isset($_SESSION['user'])){
+            render_template('admin_index');
+        } else {
+            render_template('admin_login');
+        }
     }
 }
-// Main
+// M A I N
+session_start();
 get_settings();
 if(get_request('id') == 'admin'){
     load_admin();
+} else if(get_request('id') == 'logout'){
+    session_destroy();
 } else if(get_request('id') == NULL){
     render_template('header');
     render_template('posts');

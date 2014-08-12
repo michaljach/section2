@@ -3,6 +3,7 @@ define('TITLE', 'MJ Blog');
 define('HEADER', 'M');
 define('TEMPLATE', 'default');
 define('URL', 'http://localhost/section2');
+define('PASSWORD', 'dupa');
 
 define('AUTHOR', 'Michał Jach');
 define('AVATAR', 'http://photos-g.ak.instagram.com/hphotos-ak-xpa1/10522335_332680903564582_791047490_n.jpg');
