@@ -48,12 +48,12 @@ function get_post($slug){
         echo '<article' . $class . '>';
         echo '<span class="info">' . $time . ' minute read — ' . date('F j, Y', $date) . '</span>';
         echo '<h1 class="title">' . str_replace('#', '', strtok($content, "\n")) . '</h1>';        
-        echo render_markdown(stripslashes(htmlspecialchars(substr($content, strpos($content, "\n")+1))));
+        echo render_markdown(htmlspecialchars(substr($content, strpos($content, "\n")+1)));
         echo '</article>';
     }
 }
 function add_post(){
-    file_put_contents('posts/' . get_slug($_POST['title']) . '.md', '# ' . $_POST['title'] . "\r\n" . $_POST['text']);
+    file_put_contents('posts/' . get_slug($_POST['title']) . '.md', '# ' . $_POST['title'] . "\r\n" . stripslashes($_POST['text']));
 }
 function get_settings(){
     if(!file_exists('config.php')){
