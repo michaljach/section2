@@ -88,6 +88,7 @@ function render_markdown($text){
     $rules = array (
         '/(#+) (.*)/' => sprintf ('<h%d>%s</h%d>', strlen('$1'), trim ('$2'), strlen('$1')),
         '/\!\[(.*)\]\((.*)\)/' => '<img src="$2" alt="$1">',
+        '/\@\((.*)\)/' => '<video controls><source src="$1" type="video/mp4"></video>',
         '/\[([^\[]+)\]\(([^\)]+)\)/' => '<a href=\'\2\'>\1</a>',
         '/(\*\*|__)(.*?)\1/' => '<strong>\2</strong>',
         '/[\s]+(\*|_)(.*?)\1/' => ' <em>\2</em>',
